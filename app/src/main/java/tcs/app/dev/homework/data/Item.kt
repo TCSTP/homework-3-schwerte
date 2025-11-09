@@ -1,4 +1,4 @@
-package tcs.app.dev.homework
+package tcs.app.dev.homework.data
 
 data class Item(val name: String) {
     override fun toString(): String {

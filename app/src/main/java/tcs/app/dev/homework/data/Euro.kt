@@ -1,4 +1,4 @@
-package tcs.app.dev.homework
+package tcs.app.dev.homework.data
 
 data class Euro(val cent: UInt) {
     override fun toString(): String {
@@ -38,3 +38,8 @@ operator fun Euro.div(other: UInt): Euro {
 infix operator fun Euro.compareTo(other: Euro): Int {
     return (other.cent - this.cent).toInt()
 }
+val UInt.cents: Euro
+    get() = Euro(this)
+
+val UInt.euro: Euro
+    get() = Euro(this * 100u)

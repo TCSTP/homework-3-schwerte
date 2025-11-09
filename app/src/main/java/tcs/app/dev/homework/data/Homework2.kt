@@ -1,4 +1,4 @@
-package tcs.app.dev.homework
+package tcs.app.dev.homework.data
 
 /**
  * # Homework 2: Modeling a Shop
@@ -77,16 +77,9 @@ fun main() {
         mapOf(banana to 3u, apple to appleAmount, gFig to 2u),
         listOf(
             Percentage(20u),
-            Bundle((3u to 2u), shop.items[apple], appleAmount, apple),
+            Bundle(3u, 2u, apple),
             Fixed(150u)
         )
     )
     println(cart)
-    println()
-    // val threeToFive = Bundle((3u to 5u), shop.items[apple], appleAmount, apple)
-    // println(cart + threeToFive)
-    // println()
-    // val threeToOne = Bundle((3u to 1u), shop.items[apple], appleAmount, apple)
-    // println(cart + threeToOne)
-    println(cart + apple)
 }

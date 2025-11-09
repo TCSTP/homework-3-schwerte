@@ -1,4 +1,4 @@
-package tcs.app.dev.homework
+package tcs.app.dev.homework.data
 
 import kotlin.collections.iterator
 
@@ -39,11 +39,9 @@ data class Cart(
             // check if there already is a bundle targeting the same item
             if (temp != null) {
                 // check which bundle gives a greater reduction
-                if (bundle > temp) {
-                    println("new is better than old: $bundle > $temp")
+                if (bundle.calc(currentTotal, this) > temp.calc(currentTotal, this)) {
                     bundles += (bundle.item to bundle) // the new one gives more
                 } else {
-                    println("new is worse than old: $bundle < $temp")
                     bundles += (bundle.item to temp)   // the old one gives more
                 }
             } else {
@@ -51,13 +49,13 @@ data class Cart(
             }
         }
         for (bundle in bundles) {
-            currentTotal = bundle.value.calc(currentTotal)
+            currentTotal = bundle.value.calc(currentTotal, this)
         }
         val discounts =
             this.discount.filterIsInstance<Fixed>() +
             this.discount.filterIsInstance<Percentage>()
         for (reduction in discounts) {
-            currentTotal = reduction.calc(currentTotal)
+            currentTotal = reduction.calc(currentTotal, this)
         }
         currentTotal
     }

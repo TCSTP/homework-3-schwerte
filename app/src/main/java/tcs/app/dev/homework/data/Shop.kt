@@ -1,4 +1,4 @@
-package tcs.app.dev.homework
+package tcs.app.dev.homework.data
 
 import kotlin.collections.iterator
 
