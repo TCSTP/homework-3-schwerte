@@ -17,13 +17,11 @@ private data class UIItem(
  **/
 object MockData {
     val Apple = Item("Apple")
-    val applePrice = Euro(60u)
     val Banana = Item("Banana")
-    val bananaPrice = Euro(90u)
 
     private val ExampleItems = listOf(
-        UIItem(Apple, applePrice, R.drawable.apple, R.string.name_apple),
-        UIItem(Banana, bananaPrice, R.drawable.banana, R.string.name_banana),
+        UIItem(Apple, 60u.cents, R.drawable.apple, R.string.name_apple),
+        UIItem(Banana, 90u.cents, R.drawable.banana, R.string.name_banana),
         UIItem(Item("GoldenFig"), 16u.euro + 80u.cents, R.drawable.golden_fig, R.string.name_golden_fig),
         UIItem(Item("Bread"), 1u.euro + 90u.cents, R.drawable.bread, R.string.name_bread),
         UIItem(Item("Chair"), 49u.euro + 99u.cents, R.drawable.chair, R.string.name_chair),
