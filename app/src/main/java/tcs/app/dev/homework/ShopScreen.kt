@@ -6,9 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import tcs.app.dev.homework1.data.Cart
-import tcs.app.dev.homework1.data.Discount
-import tcs.app.dev.homework1.data.Shop
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import tcs.app.dev.homework.data.Cart
+import tcs.app.dev.homework.data.Discount
+import tcs.app.dev.homework.data.Screen.*
+import tcs.app.dev.homework.data.Shop
+import tcs.app.dev.R
+import tcs.app.dev.homework.data.MockData
+import tcs.app.dev.ui.theme.AppTheme
 
 /**
  * # Homework 3 — Shop App
@@ -99,5 +105,27 @@ fun ShopScreen(
     modifier: Modifier = Modifier
 ) {
     var cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
+    var screen by rememberSaveable { mutableStateOf(SHOP) }
 
+    when (val displayedScreen = screen) {
+        SHOP -> ItemSelection(
+            title = stringResource(R.string.label_shop),
+            shop = shop,
+            onCart = { currentScreen -> screen = currentScreen },
+            onDiscount = { currentScreen -> screen = currentScreen }
+        )
+        else -> ItemSelection(
+            title = screen.toString(),
+            shop = shop
+        )
+    }
+}
+
+@Composable
+@Preview
+fun ShopScreenPreview() {
+    AppTheme {
+        ShopScreen(shop = MockData.ExampleShop,
+            availableDiscounts = listOf())
+    }
 }
