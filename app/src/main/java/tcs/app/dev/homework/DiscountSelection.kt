@@ -35,14 +35,15 @@ import tcs.app.dev.R
 import tcs.app.dev.homework.data.Screen.*
 
 @Composable
-fun ItemSelection(
+fun DiscountSelection(
     title: String,
     modifier: Modifier = Modifier,
-    onDiscount: (Screen) -> Unit = {},
+    onShop: (Screen) -> Unit = {},
     onCart: (Screen) -> Unit = {},
-    cart: Cart
+    cart: Cart,
+    discounts: List<Discount>
 ) {
-    var screen: Screen? by rememberSaveable { mutableStateOf(SHOP) }
+    var screen: Screen? by rememberSaveable { mutableStateOf(DISCOUNT) }
     val shop = cart.shop
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
@@ -55,7 +56,7 @@ fun ItemSelection(
         )
         {
             Button(
-                onClick = { screen?.let(onDiscount) },
+                onClick = { screen?.let(onShop) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -107,13 +108,7 @@ fun ItemSelection(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(shop.items.toList()) { item ->
-                ItemRow(
-                    image = painterResource(MockData.getImage(item.first)),
-                    title = stringResource(MockData.getName(item.first)),
-                    price = item.second.toString(),
-                    modifier = Modifier
-                )
+            items(discounts) { discount -> null
             }
         }
     }
@@ -121,11 +116,12 @@ fun ItemSelection(
 
 @Composable
 @Preview
-fun ItemSelectionPreview() {
+fun DiscountSelectionPreview() {
     AppTheme {
-        ItemSelection(
-            title = stringResource(R.string.label_shop),
-            cart = Cart(shop = MockData.ExampleShop, currentCart = mapOf(), discount = listOf())
+        DiscountSelection(
+            title = stringResource(R.string.title_discounts),
+            cart = Cart(shop = MockData.ExampleShop, currentCart = mapOf(), discount = listOf()),
+            discounts = MockData.ExampleDiscounts
         )
     }
 }

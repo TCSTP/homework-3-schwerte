@@ -110,13 +110,13 @@ fun ShopScreen(
     when (val displayedScreen = screen) {
         SHOP -> ItemSelection(
             title = stringResource(R.string.label_shop),
-            shop = shop,
+            cart = cart,
             onCart = { currentScreen -> screen = currentScreen },
             onDiscount = { currentScreen -> screen = currentScreen }
         )
         else -> ItemSelection(
             title = screen.toString(),
-            shop = shop
+            cart = cart
         )
     }
 }
