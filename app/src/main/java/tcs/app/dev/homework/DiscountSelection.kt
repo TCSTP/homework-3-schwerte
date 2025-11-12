@@ -1,5 +1,6 @@
 package tcs.app.dev.homework
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -10,13 +11,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Discount
+import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.Button
 import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,14 +27,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tcs.app.dev.homework.data.*
 import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.R
 import tcs.app.dev.homework.data.Screen.*
+import tcs.app.dev.homework.data.MockData.ExampleShop
+import tcs.app.dev.homework.data.MockData.ExampleDiscounts
 
 @Composable
 fun DiscountSelection(
@@ -55,8 +59,24 @@ fun DiscountSelection(
             horizontalArrangement = Arrangement.SpaceEvenly
         )
         {
+            Surface(
+                shape = MaterialTheme.shapes.extraLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
+                modifier = modifier
+                    .size(180.dp, 64.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceBright)
+            ) {
+                Text(
+                    text = title,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    textAlign = TextAlign.Center
+                )
+            }
             Button(
-                onClick = { screen?.let(onShop) },
+                onClick = { screen = SHOP; screen?.let(onShop) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -65,22 +85,16 @@ fun DiscountSelection(
                 )
             ) {
                 Icon(
-                    Icons.Outlined.Discount,
-                    contentDescription = "Discount",
+                    Icons.Outlined.ShoppingBag,
+                    contentDescription = "Shop",
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
             }
-            Text(
-                text = title,
-                modifier = Modifier.padding(horizontal = 4.dp),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSecondary
-            )
             Button(
-                onClick = { screen = DISCOUNT; screen?.let(onCart) },
+                onClick = { screen = CART; screen?.let(onCart) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -108,7 +122,15 @@ fun DiscountSelection(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(discounts) { discount -> null
+            items(discounts) { discount ->
+                val title = stringResource(
+                    when (discount) {
+                        is Fixed -> R.string.amount_off
+                        is Percentage -> R.string.percentage_off
+                        is Bundle -> R.string.pay_n_items_and_get
+                    }
+                )
+                DiscountRow(discount, title, cart, modifier)
             }
         }
     }
@@ -120,8 +142,8 @@ fun DiscountSelectionPreview() {
     AppTheme {
         DiscountSelection(
             title = stringResource(R.string.title_discounts),
-            cart = Cart(shop = MockData.ExampleShop, currentCart = mapOf(), discount = listOf()),
-            discounts = MockData.ExampleDiscounts
+            cart = Cart(ExampleShop, discount = listOf(ExampleDiscounts[2])),
+            discounts = ExampleDiscounts
         )
     }
 }

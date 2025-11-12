@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.Backpack
 import androidx.compose.material.icons.outlined.Euro
 import androidx.compose.material.icons.outlined.Percent
+import androidx.compose.material.icons.outlined.RemoveShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
@@ -18,6 +19,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,11 +30,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.homework.data.*
-import tcs.app.dev.homework.data.MockData
+import tcs.app.dev.homework.data.MockData.ExampleShop
+import tcs.app.dev.homework.data.MockData.ExampleDiscounts
 import tcs.app.dev.R
 
 @Composable
-fun DiscountRow(discount: Discount, title: String, modifier: Modifier) {
+fun DiscountRow(
+    discount: Discount,
+    title: String,
+    cart: Cart,
+    modifier: Modifier
+) {
+    var inCart by rememberSaveable { mutableStateOf(cart.discount.contains(discount)) }
 
     val border = BorderStroke(
         width = 1.dp,
@@ -66,23 +78,23 @@ fun DiscountRow(discount: Discount, title: String, modifier: Modifier) {
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             val text = when (discount) {
-                is Fixed -> String.format(title, "%.2f €".format(discount.value.toDouble() / 100)) //hope this is not cheating
-                is Percentage -> String.format(title, discount.value)
-                is Bundle -> String.format(title, discount.pay, discount.item, discount.get)
+                is Fixed -> title.format( discount.value.cents)
+                is Percentage -> title.format(discount.value)
+                is Bundle -> title.format(discount.pay, discount.item, discount.get)
             }
             Text(text, modifier = modifier)
             Button(
-                onClick = { }, content =
-                    {
-                        Icon(
-                            Icons.Outlined.AddShoppingCart,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .size(32.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                    },
+                onClick = { },
+                content = {
+                    Icon(
+                        imageVector = if (inCart) Icons.Outlined.RemoveShoppingCart else Icons.Outlined.AddShoppingCart,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(32.dp),
+                        tint = if (inCart) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -101,10 +113,12 @@ fun DiscountRowAmountPreview() {
         DiscountRow(
             title = stringResource(R.string.amount_off),
             modifier = Modifier,
-            discount = MockData.ExampleDiscounts[0]
+            discount = ExampleDiscounts[0],
+            cart = Cart(ExampleShop)
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun DiscountRowPercentPreview() {
@@ -112,18 +126,22 @@ fun DiscountRowPercentPreview() {
         DiscountRow(
             title = stringResource(R.string.percentage_off),
             modifier = Modifier,
-            discount = MockData.ExampleDiscounts[1]
+            discount = ExampleDiscounts[1],
+            cart = Cart(ExampleShop)
         )
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun DiscountRowBundlePreview() {
     AppTheme {
+        val discount = ExampleDiscounts[2]
         DiscountRow(
             title = stringResource(R.string.pay_n_items_and_get),
             modifier = Modifier,
-            discount = MockData.ExampleDiscounts[2]
+            discount = discount,
+            cart = Cart(ExampleShop, discount = listOf(discount))
         )
     }
 }

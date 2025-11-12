@@ -33,6 +33,9 @@ import tcs.app.dev.homework.data.*
 import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.R
 import tcs.app.dev.homework.data.Screen.*
+import tcs.app.dev.homework.data.MockData.ExampleShop
+import tcs.app.dev.homework.data.MockData.getName
+import tcs.app.dev.homework.data.MockData.getImage
 
 @Composable
 fun ItemSelection(
@@ -55,7 +58,7 @@ fun ItemSelection(
         )
         {
             Button(
-                onClick = { screen?.let(onDiscount) },
+                onClick = { screen = DISCOUNT; screen?.let(onDiscount) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -79,7 +82,7 @@ fun ItemSelection(
                 color = MaterialTheme.colorScheme.onSecondary
             )
             Button(
-                onClick = { screen = DISCOUNT; screen?.let(onCart) },
+                onClick = { screen = CART; screen?.let(onCart) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -109,8 +112,8 @@ fun ItemSelection(
         ) {
             items(shop.items.toList()) { item ->
                 ItemRow(
-                    image = painterResource(MockData.getImage(item.first)),
-                    title = stringResource(MockData.getName(item.first)),
+                    image = painterResource(getImage(item.first)),
+                    title = stringResource(getName(item.first)),
                     price = item.second.toString(),
                     modifier = Modifier
                 )
@@ -125,7 +128,7 @@ fun ItemSelectionPreview() {
     AppTheme {
         ItemSelection(
             title = stringResource(R.string.label_shop),
-            cart = Cart(shop = MockData.ExampleShop, currentCart = mapOf(), discount = listOf())
+            cart = Cart(shop = ExampleShop, currentCart = mapOf(), discount = listOf())
         )
     }
 }
