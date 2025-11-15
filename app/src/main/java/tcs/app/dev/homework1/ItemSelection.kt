@@ -27,7 +27,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,14 +36,12 @@ import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.R.string.*
 import tcs.app.dev.homework1.data.Screen.*
 import tcs.app.dev.homework1.data.MockData.ExampleShop
-import tcs.app.dev.homework1.data.MockData.getName
-import tcs.app.dev.homework1.data.MockData.getImage
 
 @Composable
 fun ItemSelection(
     modifier: Modifier = Modifier,
-    onDiscount: (Screen) -> Unit = {},
-    onCart: (Screen) -> Unit = {},
+    onScreen: (Screen) -> Unit,
+    onCart: (Cart) -> Unit,
     cart: Cart
 ) {
     var screen: Screen? by rememberSaveable { mutableStateOf(SHOP) }
@@ -60,7 +57,7 @@ fun ItemSelection(
         )
         {
             Button(
-                onClick = { screen = DISCOUNT; screen?.let(onDiscount) },
+                onClick = { screen = DISCOUNT; screen?.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -94,7 +91,7 @@ fun ItemSelection(
                 )
             }
             Button(
-                onClick = { screen = CART; screen?.let(onCart) },
+                onClick = { screen = CART; screen?.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -124,9 +121,10 @@ fun ItemSelection(
         ) {
             items(shop.items.toList()) { item ->
                 ItemRow(
-                    image = painterResource(getImage(item)),
-                    title = stringResource(getName(item)),
-                    price = (shop.prices[item]?:Euro(0u)).toString(),
+                    item = item,
+                    cart = cart,
+                    price = shop.prices[item]?:Euro(0u),
+                    onCart = onCart,
                     modifier = Modifier
                 )
             }
@@ -139,7 +137,8 @@ fun ItemSelection(
 fun ItemSelectionPreview() {
     AppTheme {
         ItemSelection(
-            cart = Cart(shop = ExampleShop)
+            cart = Cart(shop = ExampleShop),
+            onCart = {}, onScreen = {}
         )
     }
 }

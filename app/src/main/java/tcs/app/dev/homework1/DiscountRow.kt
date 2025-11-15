@@ -33,17 +33,17 @@ import tcs.app.dev.homework1.data.*
 import tcs.app.dev.homework1.data.MockData.ExampleShop
 import tcs.app.dev.homework1.data.MockData.ExampleDiscounts
 import tcs.app.dev.R.string.*
-import tcs.app.dev.exercise.viewmodel.data.getImage
 import tcs.app.dev.homework1.data.Discount.*
 import tcs.app.dev.homework1.data.MockData.getName
 
 @Composable
 fun DiscountRow(
     discount: Discount,
-    title: String,
     cart: Cart,
-    modifier: Modifier
+    modifier: Modifier,
+    onCart: (Cart) -> Unit
 ) {
+    var cart: Cart by rememberSaveable { mutableStateOf(cart) }
     var inCart: Boolean by rememberSaveable { mutableStateOf(cart.discounts.contains(discount)) }
 
     val border = BorderStroke(
@@ -81,22 +81,24 @@ fun DiscountRow(
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             val text = when (discount) {
-                is Fixed -> title.format( discount.amount.cents)
-                is Percentage -> title.format(discount.value)
-                is Bundle -> title.format(discount.amountItemsPay, stringResource(getName(discount.item)), discount.amountItemsGet)
+                is Fixed -> stringResource(amount_off).format(discount.amount)
+                is Percentage -> stringResource(percentage_off).format(discount.value)
+                is Bundle -> stringResource(pay_n_items_and_get).format(
+                    discount.amountItemsPay,
+                    stringResource(getName(discount.item)),
+                    discount.amountItemsGet
+                )
             }
             Text(text, modifier = modifier)
             Button(
-                onClick = { },
-                content = {
-                    Icon(
-                        imageVector = if (inCart) Icons.Outlined.RemoveShoppingCart else Icons.Outlined.AddShoppingCart,
-                        contentDescription = "Close",
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .size(32.dp),
-                        tint = if (inCart) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
+                onClick = {
+                    if (inCart) {
+                        cart -= discount
+                    } else {
+                        cart += discount
+                    }
+                    cart.let( onCart )
+                    inCart = !inCart
                 },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -104,7 +106,16 @@ fun DiscountRow(
                     disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                     disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
-            )
+            ) {
+                Icon(
+                    imageVector = if (inCart) Icons.Outlined.RemoveShoppingCart else Icons.Outlined.AddShoppingCart,
+                    contentDescription = "Close",
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(32.dp),
+                    tint = if (inCart) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
         }
     }
 }
@@ -114,11 +125,10 @@ fun DiscountRow(
 fun DiscountRowAmountPreview() {
     AppTheme {
         DiscountRow(
-            title = stringResource(amount_off),
             modifier = Modifier,
             discount = ExampleDiscounts[0],
             cart = Cart(ExampleShop)
-        )
+        ) { {} }
     }
 }
 
@@ -127,11 +137,10 @@ fun DiscountRowAmountPreview() {
 fun DiscountRowPercentPreview() {
     AppTheme {
         DiscountRow(
-            title = stringResource(percentage_off),
             modifier = Modifier,
             discount = ExampleDiscounts[1],
             cart = Cart(ExampleShop)
-        )
+        ) { {} }
     }
 }
 
@@ -141,10 +150,9 @@ fun DiscountRowBundleInCartPreview() {
     AppTheme {
         val discount = ExampleDiscounts[2]
         DiscountRow(
-            title = stringResource(pay_n_items_and_get),
             modifier = Modifier,
             discount = discount,
             cart = Cart(ExampleShop, allDiscounts = listOf(discount))
-        )
+        ) { {} }
     }
 }

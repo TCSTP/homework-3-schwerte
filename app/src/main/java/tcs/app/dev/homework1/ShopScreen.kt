@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import tcs.app.dev.homework1.data.Cart
 import tcs.app.dev.homework1.data.Discount
 import tcs.app.dev.homework1.data.Shop
+import tcs.app.dev.homework1.data.Screen.*
 
 /**
  * # Homework 3 — Shop App
@@ -68,9 +69,9 @@ import tcs.app.dev.homework1.data.Shop
  *        button to return to the shop.
  *
  * - **Bottom bar**:
-*       - In Shop/Discounts, show a 2-tab bottom bar to switch between **Shop** and **Discounts**.
-*       - In Cart, hide the tab bar and instead show the cart bottom bar with the total and **Pay**
-*         action as described above.
+ *       - In Shop/Discounts, show a 2-tab bottom bar to switch between **Shop** and **Discounts**.
+ *       - In Cart, hide the tab bar and instead show the cart bottom bar with the total and **Pay**
+ *         action as described above.
  *
  * ## Hints
  * - Keep your cart as a single source of truth and derive counts/price from it.
@@ -93,11 +94,45 @@ import tcs.app.dev.homework1.data.Shop
  *
  */
 @Composable
-fun ShopScreen(
+fun ShopScreenOld(
     shop: Shop,
     availableDiscounts: List<Discount>,
     modifier: Modifier = Modifier
 ) {
     var cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
 
+}
+
+@Composable
+fun ShopScreen(
+    shop: Shop,
+    availableDiscounts: List<Discount>,
+    modifier: Modifier = Modifier
+) {
+    var cart: Cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
+    var screen by rememberSaveable { mutableStateOf(SHOP) }
+
+    when (val displayedScreen = screen) {
+        SHOP -> ItemSelection(
+            cart = cart,
+            onScreen = { currentScreen -> screen = currentScreen },
+            onCart = { currentCart -> cart = currentCart },
+            modifier = modifier
+        )
+
+        DISCOUNT -> DiscountSelection(
+            cart = cart,
+            discounts = availableDiscounts,
+            onScreen = { currentScreen -> screen = currentScreen },
+            onCart = { currentCart -> cart = currentCart },
+            modifier = modifier
+        )
+
+        CART -> CartSelection(
+            cart = cart,
+            onScreen = { currentScreen -> screen = currentScreen },
+            onCart = { currentCart -> cart = currentCart },
+            modifier = modifier
+        )
+    }
 }

@@ -37,7 +37,6 @@ import tcs.app.dev.R.string.*
 @Composable
 fun DiscountRow(
     discount: Discount,
-    title: String,
     cart: Cart,
     modifier: Modifier
 ) {
@@ -78,9 +77,9 @@ fun DiscountRow(
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             val text = when (discount) {
-                is Fixed -> title.format( discount.value.cents)
-                is Percentage -> title.format(discount.value)
-                is Bundle -> title.format(discount.pay, discount.item, discount.get)
+                is Fixed -> stringResource(amount_off).format( discount.value.cents)
+                is Percentage -> stringResource(percentage_off).format(discount.value)
+                is Bundle -> stringResource(pay_n_items_and_get).format(discount.pay, discount.item, discount.get)
             }
             Text(text, modifier = modifier)
             Button(
@@ -111,7 +110,6 @@ fun DiscountRow(
 fun DiscountRowAmountPreview() {
     AppTheme {
         DiscountRow(
-            title = stringResource(amount_off),
             modifier = Modifier,
             discount = ExampleDiscounts[0],
             cart = Cart(ExampleShop)
@@ -124,7 +122,6 @@ fun DiscountRowAmountPreview() {
 fun DiscountRowPercentPreview() {
     AppTheme {
         DiscountRow(
-            title = stringResource(percentage_off),
             modifier = Modifier,
             discount = ExampleDiscounts[1],
             cart = Cart(ExampleShop)
@@ -138,7 +135,6 @@ fun DiscountRowBundleInCartPreview() {
     AppTheme {
         val discount = ExampleDiscounts[2]
         DiscountRow(
-            title = stringResource(pay_n_items_and_get),
             modifier = Modifier,
             discount = discount,
             cart = Cart(ExampleShop, discount = listOf(discount))

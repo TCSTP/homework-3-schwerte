@@ -16,6 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,13 +28,21 @@ import androidx.compose.ui.unit.dp
 import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.homework1.data.*
 import tcs.app.dev.homework1.data.MockData.ExampleDiscounts
+import tcs.app.dev.homework1.data.MockData.ExampleShop
 import tcs.app.dev.R.string.*
+import tcs.app.dev.homework1.data.Cart
 import tcs.app.dev.homework1.data.Discount.*
 import tcs.app.dev.homework1.data.MockData.getName
 
 @Composable
-fun CartDiscountRow(discount: Discount, title: String, modifier: Modifier) {
+fun CartDiscountRow(
+    discount: Discount,
+    cart: Cart,
+    modifier: Modifier,
+    onCart: (Cart) -> Unit,
+) {
 
+    var cart by rememberSaveable { mutableStateOf(cart) }
     val border = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.outline
@@ -66,13 +78,21 @@ fun CartDiscountRow(discount: Discount, title: String, modifier: Modifier) {
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
             )
             val text = when (discount) {
-                is Fixed -> title.format( discount.amount.cents)
-                is Percentage -> title.format(discount.value)
-                is Bundle -> title.format(discount.amountItemsPay, stringResource(getName(discount.item)), discount.amountItemsGet)
+                is Fixed -> stringResource(amount_off).format(discount.amount)
+                is Percentage -> stringResource(percentage_off).format(discount.value)
+                is Bundle -> stringResource(pay_n_items_and_get).format(
+                    discount.amountItemsPay,
+                    stringResource(getName(discount.item)),
+                    discount.amountItemsGet
+                )
             }
             Text(text, modifier = modifier)
             Surface(
-                onClick = { }, color = MaterialTheme.colorScheme.error.copy(0.85f),
+                onClick = {
+                    cart -= discount
+                    cart.let(onCart)
+                },
+                color = MaterialTheme.colorScheme.error.copy(0.85f),
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = modifier.size(26.dp),
             )
@@ -96,9 +116,9 @@ fun CartDiscountRowFixedPreview() {
     AppTheme {
         CartDiscountRow(
             discount = ExampleDiscounts[0],
-            title = stringResource(amount_off),
-            modifier = Modifier
-        )
+            modifier = Modifier,
+            cart = Cart(ExampleShop)
+        ) { {} }
     }
 }
 
@@ -108,9 +128,9 @@ fun CartDiscountRowPercentagePreview() {
     AppTheme {
         CartDiscountRow(
             discount = ExampleDiscounts[1],
-            title = stringResource(percentage_off),
-            modifier = Modifier
-        )
+            modifier = Modifier,
+            cart = Cart(ExampleShop)
+        ) { {} }
     }
 }
 
@@ -120,8 +140,8 @@ fun CartDiscountRowBundlePreview() {
     AppTheme {
         CartDiscountRow(
             discount = ExampleDiscounts[2],
-            title = stringResource(pay_n_items_and_get),
-            modifier = Modifier
-        )
+            modifier = Modifier,
+            cart = Cart(ExampleShop)
+        ) { {} }
     }
 }

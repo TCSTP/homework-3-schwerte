@@ -45,12 +45,13 @@ import tcs.app.dev.homework1.data.Discount.*
 @Composable
 fun CartSelection(
     modifier: Modifier = Modifier,
-    onDiscount: (Screen) -> Unit = {},
-    onShop: (Screen) -> Unit = {},
+    onScreen: (Screen) -> Unit,
+    onCart: (Cart) -> Unit,
     cart: Cart
 ) {
-    var screen: Screen? by rememberSaveable { mutableStateOf(SHOP) }
-    val shop = cart.shop
+    var screen: Screen? by rememberSaveable { mutableStateOf(CART) }
+    var cart: Cart by rememberSaveable { mutableStateOf(cart) }
+
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
             modifier = Modifier
@@ -62,7 +63,7 @@ fun CartSelection(
         )
         {
             Button(
-                onClick = { screen = DISCOUNT; screen?.let(onDiscount) },
+                onClick = { screen = DISCOUNT; screen?.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -80,7 +81,7 @@ fun CartSelection(
                 )
             }
             Button(
-                onClick = { screen = SHOP; screen?.let(onShop) },
+                onClick = { screen = SHOP; screen?.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -131,7 +132,11 @@ fun CartSelection(
                 color = MaterialTheme.colorScheme.onSecondary
             )
             Button(
-                onClick = { screen = SHOP; screen?.let(onShop) },
+                onClick = {
+                    screen = SHOP; cart = Cart(cart.shop); cart.let(onCart); screen?.let(
+                    onScreen
+                )
+                },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -159,25 +164,24 @@ fun CartSelection(
         ) {
             items(cart.items.entries.toList()) { item ->
                 CartItemRow(
-                    image = painterResource(getImage(item.key)),
-                    title = stringResource(getName(item.key)),
-                    price = shop.prices[item.key]?:Euro(0u),
-                    amount = item.value,
+                    item = item.key,
+                    cart = cart,
                     modifier = Modifier
-                )
+                ) {onCart}
             }
             items(1) { line ->
-                HorizontalDivider(modifier = modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.secondary, thickness = 1.dp)}
+                HorizontalDivider(
+                    modifier = modifier.padding(vertical = 8.dp),
+                    color = MaterialTheme.colorScheme.secondary,
+                    thickness = 1.dp
+                )
+            }
             items(cart.discounts) { discount ->
                 CartDiscountRow(
-                    title = stringResource(when (discount) {
-                        is Fixed -> amount_off
-                        is Percentage -> percentage_off
-                        is Bundle -> pay_n_items_and_get
-                    }),
                     discount = discount,
-                    modifier = Modifier
-                )
+                    modifier = Modifier,
+                    cart = cart
+                ) { onCart }
             }
         }
     }
@@ -188,8 +192,16 @@ fun CartSelection(
 fun CartSelectionPreview() {
     AppTheme {
         CartSelection(
-            cart = Cart(shop = ExampleShop, items = mapOf(Item("Apple") to 4u, Item("Banana") to 8u), allDiscounts = listOf(Fixed(50u.cents),
-                Bundle(amountItemsGet = 3u, amountItemsPay = 2u, item = Item("Apple"))))
+            cart = Cart(
+                shop = ExampleShop,
+                items = mapOf(Item("Apple") to 4u, Item("Banana") to 8u),
+                allDiscounts = listOf(
+                    Fixed(50u.cents),
+                    Bundle(amountItemsGet = 3u, amountItemsPay = 2u, item = Item("Apple"))
+                )
+            ),
+            onCart = {},
+            onScreen = {}
         )
     }
 }

@@ -128,7 +128,7 @@ fun DiscountSelection(
                         is Bundle -> pay_n_items_and_get
                     }
                 )
-                DiscountRow(discount, title, cart, modifier)
+                DiscountRow(discount, cart, modifier)
             }
         }
     }

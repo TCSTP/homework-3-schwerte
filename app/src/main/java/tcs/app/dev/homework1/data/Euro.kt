@@ -28,7 +28,7 @@ import kotlinx.parcelize.Parcelize
 value class Euro(val cents: UInt) : Comparable<Euro>, Parcelable {
 
     // String representation for display only; keep all calculations in integers.
-    override fun toString(): String = "€%.2f".format(cents.toDouble() / 100.0)
+    override fun toString(): String = "%.2f€".format(cents.toDouble() / 100.0)
 
     override fun compareTo(other: Euro) = this.cents.compareTo(other.cents)
 }

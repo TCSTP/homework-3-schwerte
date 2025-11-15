@@ -16,6 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -23,6 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import tcs.app.dev.homework1.data.Cart
 import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.homework1.data.*
 import tcs.app.dev.homework1.data.MockData.ExampleShop
@@ -30,21 +35,25 @@ import tcs.app.dev.homework1.data.MockData.getName
 import tcs.app.dev.homework1.data.MockData.getImage
 
 @Composable
-fun CartItemRow(image: Painter, amount: UInt, title: String, price: Euro, modifier: Modifier) {
-
+fun CartItemRow(
+    item: Item,
+    cart: Cart,
+    modifier: Modifier,
+    onCart: (Cart) -> Unit
+) {
+    var amount by rememberSaveable { mutableStateOf(cart.items[item]?:0u) }
+    var cart by rememberSaveable { mutableStateOf(cart) }
     val border = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.outline
     )
-
-    val color = MaterialTheme.colorScheme.surface
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = MaterialTheme.shapes.medium,
         border = border,
-        color = color,
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
             modifier = Modifier
@@ -53,8 +62,25 @@ fun CartItemRow(image: Painter, amount: UInt, title: String, price: Euro, modifi
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(painter = image, contentDescription = null, modifier = modifier.size(40.dp))
-            Surface(modifier = modifier) {
+            Image(
+                painter = painterResource(getImage(item)),
+                contentDescription = null,
+                modifier = modifier.size(40.dp)
+            )
+            Surface(
+                modifier = modifier,
+                onClick = {
+                    cart.items[item]?.let {
+                        if (it > 1u) {
+                            cart -= item
+                        } else {
+                            cart = cart.copy(items = cart.items.filter { it -> it.key != item })
+                        }
+                    }
+                    cart.let(onCart)
+                    amount--
+                }
+            ) {
                 Icon(
                     Icons.Rounded.ArrowBackIosNew,
                     contentDescription = null,
@@ -63,8 +89,15 @@ fun CartItemRow(image: Painter, amount: UInt, title: String, price: Euro, modifi
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
-            Text(amount.toString(), modifier = modifier)
-            Surface(modifier = modifier) {
+            Text(cart.items[item].toString(), modifier = modifier)
+            Surface(
+                modifier = modifier,
+                onClick = {
+                    cart += item
+                    cart.let(onCart)
+                    amount++
+                }
+            ) {
                 Icon(
                     Icons.Rounded.ArrowForwardIos,
                     contentDescription = null,
@@ -73,10 +106,16 @@ fun CartItemRow(image: Painter, amount: UInt, title: String, price: Euro, modifi
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
-            Text(title, modifier = modifier)
-            Text((price * amount).toString(), modifier = modifier)
+            Text(stringResource(getName(item)), modifier = modifier)
+            Text(
+                ((cart.shop.prices[item] ?: 0u.cents) * (cart.items[item] ?: 0u)).toString(),
+                modifier = modifier
+            )
             Surface(
-                onClick = { }, color = MaterialTheme.colorScheme.error.copy(0.85f),
+                onClick = {
+                    cart = cart.copy(items = cart.items.filter { it -> it.key != item })
+                },
+                color = MaterialTheme.colorScheme.error.copy(0.85f),
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = modifier.size(26.dp),
             )
@@ -98,17 +137,12 @@ fun CartItemRow(image: Painter, amount: UInt, title: String, price: Euro, modifi
 @Composable
 fun CartRowApplePreview() {
     val apple = Item("Apple")
-    val image = getImage(apple)
-    val title = getName(apple)
-    val price = ExampleShop.prices[apple]
     AppTheme {
         CartItemRow(
-            image = painterResource(image),
-            amount = 5u,
-            title = stringResource(title),
-            price = price ?: Euro(0u),
+            item = apple,
+            cart = Cart(ExampleShop, items = mapOf(apple to 3u)),
             modifier = Modifier
-        )
+        ) { {} }
     }
 }
 
@@ -116,16 +150,11 @@ fun CartRowApplePreview() {
 @Composable
 fun CartRowBananaPreview() {
     val banana = Item("Banana")
-    val image = getImage(banana)
-    val title = getName(banana)
-    val price = ExampleShop.prices[banana]
     AppTheme {
         CartItemRow(
-            image = painterResource(image),
-            amount = 2u,
-            title = stringResource(title),
-            price = price ?: Euro(0u),
+            item = banana,
+            cart = Cart(ExampleShop, items = mapOf(banana to 5u)),
             modifier = Modifier
-        )
+        ) { {} }
     }
 }

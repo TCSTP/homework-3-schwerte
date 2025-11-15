@@ -42,8 +42,8 @@ import tcs.app.dev.homework1.data.Discount.*
 @Composable
 fun DiscountSelection(
     modifier: Modifier = Modifier,
-    onShop: (Screen) -> Unit = {},
-    onCart: (Screen) -> Unit = {},
+    onScreen: (Screen) -> Unit,
+    onCart: (Cart) -> Unit,
     cart: Cart,
     discounts: List<Discount>
 ) {
@@ -75,7 +75,7 @@ fun DiscountSelection(
                 )
             }
             Button(
-                onClick = { screen = SHOP; screen?.let(onShop) },
+                onClick = { screen = SHOP; screen?.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -93,7 +93,7 @@ fun DiscountSelection(
                 )
             }
             Button(
-                onClick = { screen = CART; screen?.let(onCart) },
+                onClick = { screen = CART; screen?.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -122,14 +122,11 @@ fun DiscountSelection(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(discounts) { discount ->
-                val title = stringResource(
-                    when (discount) {
-                        is Fixed -> amount_off
-                        is Percentage -> percentage_off
-                        is Bundle -> pay_n_items_and_get
-                    }
-                )
-                DiscountRow(discount, title, cart, modifier)
+                DiscountRow(
+                    discount = discount,
+                    cart = cart,
+                    modifier = modifier,
+                    onCart = onCart)
             }
         }
     }
@@ -141,7 +138,9 @@ fun DiscountSelectionPreview() {
     AppTheme {
         DiscountSelection(
             cart = Cart(ExampleShop, allDiscounts = listOf(ExampleDiscounts[2])),
-            discounts = ExampleDiscounts
+            discounts = ExampleDiscounts,
+            onCart = {},
+            onScreen = {}
         )
     }
 }

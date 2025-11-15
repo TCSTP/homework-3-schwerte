@@ -16,23 +16,33 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tcs.app.dev.ui.theme.AppTheme
-import tcs.app.dev.homework.data.*
-import tcs.app.dev.homework.data.MockData.ExampleShop
-import tcs.app.dev.homework.data.MockData.getName
-import tcs.app.dev.homework.data.MockData.getImage
+import tcs.app.dev.homework1.data.*
+import tcs.app.dev.homework1.data.MockData.ExampleShop
+import tcs.app.dev.homework1.data.MockData.getName
+import tcs.app.dev.homework1.data.MockData.getImage
 import tcs.app.dev.R.string.*
 
 @Composable
-fun ItemRow(image: Painter, title: String, price: String, modifier: Modifier) {
+fun ItemRow(
+    item: Item,
+    cart: Cart,
+    price: Euro,
+    modifier: Modifier,
+    onCart: (Cart) -> Unit
+) {
 
+    var cart by rememberSaveable { mutableStateOf(cart) }
     val border = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.outline
@@ -54,11 +64,11 @@ fun ItemRow(image: Painter, title: String, price: String, modifier: Modifier) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(painter = image, contentDescription = null, modifier = modifier.size(40.dp))
-            Text(title, modifier = modifier)
-            Text(price, modifier = modifier)
+            Image(painter = painterResource(getImage(item)), contentDescription = stringResource(getName(item)), modifier = modifier.size(40.dp))
+            Text(stringResource(getName(item)), modifier = modifier)
+            Text(price.toString(), modifier = modifier)
             Button(
-                onClick = { }, content =
+                onClick = {cart += item; cart.let(onCart) }, content =
                     {
                         Icon(
                             Icons.Outlined.AddShoppingCart,
@@ -84,31 +94,27 @@ fun ItemRow(image: Painter, title: String, price: String, modifier: Modifier) {
 @Composable
 fun ItemRowApplePreview() {
     val apple = Item("Apple")
-    val image = getImage(apple)
-    val title = getName(apple)
-    val price = ExampleShop.items[apple]
+    val price = ExampleShop.prices[apple]
     AppTheme {
         ItemRow(
-            image = painterResource(image),
-            title = stringResource(title),
-            price = price.toString(),
+            item = apple,
+            cart = Cart(ExampleShop),
+            price = price?:0u.cents,
             modifier = Modifier
-        )
+        ) {{}}
     }
 }
 @Preview(showBackground = true)
 @Composable
 fun ItemRowBananaPreview() {
     val banana = Item("Banana")
-    val image = getImage(banana)
-    val title = getName(banana)
-    val price = ExampleShop.items[banana]
+    val price = ExampleShop.prices[banana]
     AppTheme {
         ItemRow(
-            image = painterResource(image),
-            title = stringResource(title),
-            price = price.toString(),
+            item = banana,
+            cart = Cart(ExampleShop),
+            price = price?:0u.cents,
             modifier = Modifier
-        )
+        ) {{}}
     }
 }
