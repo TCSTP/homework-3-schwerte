@@ -12,8 +12,9 @@ import tcs.app.dev.homework.data.Cart
 import tcs.app.dev.homework.data.Discount
 import tcs.app.dev.homework.data.Screen.*
 import tcs.app.dev.homework.data.Shop
-import tcs.app.dev.R
-import tcs.app.dev.homework.data.MockData
+import tcs.app.dev.R.string.*
+import tcs.app.dev.homework.data.MockData.ExampleShop
+import tcs.app.dev.homework.data.MockData.ExampleDiscounts
 import tcs.app.dev.ui.theme.AppTheme
 
 /**
@@ -109,14 +110,19 @@ fun ShopScreen(
 
     when (val displayedScreen = screen) {
         SHOP -> ItemSelection(
-            title = stringResource(R.string.label_shop),
             cart = cart,
             onCart = { currentScreen -> screen = currentScreen },
-            onDiscount = { currentScreen -> screen = currentScreen }
+            onDiscount = { currentScreen -> screen = currentScreen },
+            modifier = modifier
         )
-        else -> ItemSelection(
-            title = screen.toString(),
-            cart = cart
+        DISCOUNT -> DiscountSelection(
+            cart = cart,
+            discounts = availableDiscounts,
+            modifier = modifier
+        )
+        CART -> CartSelection(
+            cart = cart,
+            modifier = modifier
         )
     }
 }
@@ -125,7 +131,9 @@ fun ShopScreen(
 @Preview
 fun ShopScreenPreview() {
     AppTheme {
-        ShopScreen(shop = MockData.ExampleShop,
-            availableDiscounts = listOf())
+        ShopScreen(
+            shop = ExampleShop,
+            availableDiscounts = ExampleDiscounts
+        )
     }
 }

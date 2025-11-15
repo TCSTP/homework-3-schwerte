@@ -7,22 +7,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AddShoppingCart
 import androidx.compose.material.icons.outlined.Backpack
 import androidx.compose.material.icons.outlined.Euro
 import androidx.compose.material.icons.outlined.Percent
-import androidx.compose.material.icons.outlined.RemoveShoppingCart
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -30,18 +23,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.homework.data.*
-import tcs.app.dev.homework.data.MockData.ExampleShop
 import tcs.app.dev.homework.data.MockData.ExampleDiscounts
 import tcs.app.dev.R.string.*
 
 @Composable
-fun DiscountRow(
-    discount: Discount,
-    title: String,
-    cart: Cart,
-    modifier: Modifier
-) {
-    var inCart by rememberSaveable { mutableStateOf(cart.discount.contains(discount)) }
+fun CartDiscountRow(discount: Discount, title: String, modifier: Modifier) {
 
     val border = BorderStroke(
         width = 1.dp,
@@ -57,11 +43,6 @@ fun DiscountRow(
         border = border,
         color = color,
     ) {
-        val icons = when (discount) {
-            is Fixed -> (Icons.Outlined.Euro to "Euro")
-            is Percentage -> (Icons.Outlined.Percent to "Percent")
-            is Bundle -> (Icons.Outlined.Backpack to "Bundle")
-        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,6 +50,11 @@ fun DiscountRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            val icons = when (discount) {
+                is Fixed -> (Icons.Outlined.Euro to stringResource(description_euro))
+                is Percentage -> (Icons.Outlined.Percent to stringResource(description_percent))
+                is Bundle -> (Icons.Outlined.Backpack to stringResource(description_bundle))
+            }
             Icon(
                 imageVector = icons.first,
                 contentDescription = icons.second,
@@ -83,65 +69,57 @@ fun DiscountRow(
                 is Bundle -> title.format(discount.pay, discount.item, discount.get)
             }
             Text(text, modifier = modifier)
-            Button(
-                onClick = { },
-                content = {
-                    Icon(
-                        imageVector = if (inCart) Icons.Outlined.RemoveShoppingCart else Icons.Outlined.AddShoppingCart,
-                        contentDescription = "Close",
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .size(32.dp),
-                        tint = if (inCart) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                },
-                colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                )
+            Surface(
+                onClick = { }, color = MaterialTheme.colorScheme.error.copy(0.85f),
+                shape = MaterialTheme.shapes.extraLarge,
+                modifier = modifier.size(26.dp),
             )
+            {
+                Icon(
+                    Icons.Rounded.Close,
+                    contentDescription = stringResource(description_euro),
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(32.dp),
+                    tint = MaterialTheme.colorScheme.errorContainer,
+                )
+            }
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DiscountRowAmountPreview() {
+fun CartDiscountRowFixedPreview() {
     AppTheme {
-        DiscountRow(
-            title = stringResource(amount_off),
-            modifier = Modifier,
+        CartDiscountRow(
             discount = ExampleDiscounts[0],
-            cart = Cart(ExampleShop)
+            title = stringResource(amount_off),
+            modifier = Modifier
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DiscountRowPercentPreview() {
+fun CartDiscountRowPercentagePreview() {
     AppTheme {
-        DiscountRow(
-            title = stringResource(percentage_off),
-            modifier = Modifier,
+        CartDiscountRow(
             discount = ExampleDiscounts[1],
-            cart = Cart(ExampleShop)
+            title = stringResource(percentage_off),
+            modifier = Modifier
         )
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun DiscountRowBundleInCartPreview() {
+fun CartDiscountRowBundlePreview() {
     AppTheme {
-        val discount = ExampleDiscounts[2]
-        DiscountRow(
+        CartDiscountRow(
+            discount = ExampleDiscounts[2],
             title = stringResource(pay_n_items_and_get),
-            modifier = Modifier,
-            discount = discount,
-            cart = Cart(ExampleShop, discount = listOf(discount))
+            modifier = Modifier
         )
     }
 }

@@ -28,6 +28,7 @@ import tcs.app.dev.homework.data.*
 import tcs.app.dev.homework.data.MockData.ExampleShop
 import tcs.app.dev.homework.data.MockData.getName
 import tcs.app.dev.homework.data.MockData.getImage
+import tcs.app.dev.R.string.*
 
 @Composable
 fun ItemRow(image: Painter, title: String, price: String, modifier: Modifier) {
@@ -61,7 +62,7 @@ fun ItemRow(image: Painter, title: String, price: String, modifier: Modifier) {
                     {
                         Icon(
                             Icons.Outlined.AddShoppingCart,
-                            contentDescription = null,
+                            contentDescription = stringResource(description_add_to_cart),
                             modifier = Modifier
                                 .padding(horizontal = 4.dp)
                                 .size(32.dp),

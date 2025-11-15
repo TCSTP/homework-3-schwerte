@@ -12,9 +12,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Discount
+import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.Button
-import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,10 +42,10 @@ import tcs.app.dev.homework.data.MockData.getName
 import tcs.app.dev.homework.data.MockData.getImage
 
 @Composable
-fun ItemSelection(
+fun CartSelection(
     modifier: Modifier = Modifier,
     onDiscount: (Screen) -> Unit = {},
-    onCart: (Screen) -> Unit = {},
+    onShop: (Screen) -> Unit = {},
     cart: Cart
 ) {
     var screen: Screen? by rememberSaveable { mutableStateOf(SHOP) }
@@ -70,7 +71,26 @@ fun ItemSelection(
             ) {
                 Icon(
                     Icons.Outlined.Discount,
-                    contentDescription = stringResource(description_go_to_discount),
+                    contentDescription = stringResource(label_discounts),
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(32.dp),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+            }
+            Button(
+                onClick = { screen = SHOP; screen?.let(onShop) },
+                colors = ButtonColors(
+                    containerColor = MaterialTheme.colorScheme.onSecondary,
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                    disabledContainerColor = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.5f),
+                    disabledContentColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+                ),
+                enabled = cart.currentCart.isNotEmpty()
+            ) {
+                Icon(
+                    Icons.Outlined.ShoppingBag,
+                    contentDescription = stringResource(description_go_to_shop),
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
@@ -86,15 +106,31 @@ fun ItemSelection(
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceBright)
             ) {
                 Text(
-                    text = stringResource(label_shop),
+                    text = stringResource(title_cart),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }, bottomBar = {
+        Row(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.secondary)
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Text(
+                text = stringResource(total_price).format(cart.total),
+                modifier = Modifier.padding(horizontal = 4.dp),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSecondary
+            )
             Button(
-                onClick = { screen = CART; screen?.let(onCart) },
+                onClick = { screen = SHOP; screen?.let(onShop) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -103,13 +139,11 @@ fun ItemSelection(
                 ),
                 enabled = cart.currentCart.isNotEmpty()
             ) {
-                Icon(
-                    Icons.Outlined.ShoppingCart,
-                    contentDescription = stringResource(description_go_to_shop),
-                    modifier = Modifier
-                        .padding(horizontal = 4.dp)
-                        .size(32.dp),
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                Text(
+                    text = stringResource(label_pay),
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
@@ -122,11 +156,25 @@ fun ItemSelection(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(shop.items.toList()) { item ->
-                ItemRow(
-                    image = painterResource(getImage(item.first)),
-                    title = stringResource(getName(item.first)),
-                    price = item.second.toString(),
+            items(cart.currentCart.entries.toList()) { item ->
+                CartItemRow(
+                    image = painterResource(getImage(item.key)),
+                    title = stringResource(getName(item.key)),
+                    price = shop.items[item.key]?:Euro(0u),
+                    amount = item.value,
+                    modifier = Modifier
+                )
+            }
+            items(1) { line ->
+                HorizontalDivider(modifier = modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.secondary, thickness = 1.dp)}
+            items(cart.discount) { discount ->
+                CartDiscountRow(
+                    title = stringResource(when (discount) {
+                        is Fixed -> amount_off
+                        is Percentage -> percentage_off
+                        is Bundle -> pay_n_items_and_get
+                    }),
+                    discount = discount,
                     modifier = Modifier
                 )
             }
@@ -136,10 +184,11 @@ fun ItemSelection(
 
 @Composable
 @Preview
-fun ItemSelectionPreview() {
+fun CartSelectionPreview() {
     AppTheme {
-        ItemSelection(
-            cart = Cart(shop = ExampleShop, currentCart = mapOf(), discount = listOf())
+        CartSelection(
+            cart = Cart(shop = ExampleShop, currentCart = mapOf(Item("Apple") to 4u, Item("Banana") to 8u), discount = listOf(Fixed(50u.cents),
+                Bundle(3u,2u,Item("Apple"))))
         )
     }
 }

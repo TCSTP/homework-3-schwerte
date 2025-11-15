@@ -33,14 +33,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import tcs.app.dev.homework.data.*
 import tcs.app.dev.ui.theme.AppTheme
-import tcs.app.dev.R
+import tcs.app.dev.R.string.*
 import tcs.app.dev.homework.data.Screen.*
 import tcs.app.dev.homework.data.MockData.ExampleShop
 import tcs.app.dev.homework.data.MockData.ExampleDiscounts
 
 @Composable
 fun DiscountSelection(
-    title: String,
     modifier: Modifier = Modifier,
     onShop: (Screen) -> Unit = {},
     onCart: (Screen) -> Unit = {},
@@ -48,7 +47,6 @@ fun DiscountSelection(
     discounts: List<Discount>
 ) {
     var screen: Screen? by rememberSaveable { mutableStateOf(DISCOUNT) }
-    val shop = cart.shop
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
             modifier = Modifier
@@ -68,7 +66,7 @@ fun DiscountSelection(
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceBright)
             ) {
                 Text(
-                    text = title,
+                    text = stringResource(title_discounts),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -86,7 +84,7 @@ fun DiscountSelection(
             ) {
                 Icon(
                     Icons.Outlined.ShoppingBag,
-                    contentDescription = "Shop",
+                    contentDescription = stringResource(description_go_to_shop),
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
@@ -105,7 +103,7 @@ fun DiscountSelection(
             ) {
                 Icon(
                     Icons.Outlined.ShoppingCart,
-                    contentDescription = "Cart",
+                    contentDescription = stringResource(description_go_to_cart),
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
@@ -125,9 +123,9 @@ fun DiscountSelection(
             items(discounts) { discount ->
                 val title = stringResource(
                     when (discount) {
-                        is Fixed -> R.string.amount_off
-                        is Percentage -> R.string.percentage_off
-                        is Bundle -> R.string.pay_n_items_and_get
+                        is Fixed -> amount_off
+                        is Percentage -> percentage_off
+                        is Bundle -> pay_n_items_and_get
                     }
                 )
                 DiscountRow(discount, title, cart, modifier)
@@ -141,7 +139,6 @@ fun DiscountSelection(
 fun DiscountSelectionPreview() {
     AppTheme {
         DiscountSelection(
-            title = stringResource(R.string.title_discounts),
             cart = Cart(ExampleShop, discount = listOf(ExampleDiscounts[2])),
             discounts = ExampleDiscounts
         )

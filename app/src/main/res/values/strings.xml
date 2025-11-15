@@ -20,6 +20,7 @@
 
     <string name="description_go_to_cart">Go to cart</string>
     <string name="description_go_to_shop">Go to shop</string>
+    <string name="description_go_to_discount">Go to discount</string>
     <string name="description_add_to_cart">Add to cart</string>
     <string name="description_remove_from_cart">Remove from cart</string>
     <string name="description_decrease_amount">Decrease Amount</string>
@@ -43,4 +44,9 @@
     <string name="name_spaghetti">Spaghetti</string>
     <string name="name_table">Table</string>
     <string name="name_tomato">Tomato</string>
+
+    <string name="description_euro">Euro</string>
+    <string name="description_percent">Percent</string>
+    <string name="description_bundle">Bundle</string>
+    <string name="description_close">Close</string>
 </resources>
