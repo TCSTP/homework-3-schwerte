@@ -6,13 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import tcs.app.dev.homework.data.Cart
 import tcs.app.dev.homework.data.Discount
 import tcs.app.dev.homework.data.Screen.*
 import tcs.app.dev.homework.data.Shop
-import tcs.app.dev.R.string.*
 import tcs.app.dev.homework.data.MockData.ExampleShop
 import tcs.app.dev.homework.data.MockData.ExampleDiscounts
 import tcs.app.dev.ui.theme.AppTheme

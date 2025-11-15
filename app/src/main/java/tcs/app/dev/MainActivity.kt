@@ -3,6 +3,8 @@ package tcs.app.dev
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import tcs.app.dev.homework.ShopScreen
+import tcs.app.dev.homework.data.MockData
 import tcs.app.dev.ui.theme.AppTheme
 
 /**
@@ -26,6 +28,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppTheme {
+                ShopScreen(MockData.ExampleShop, MockData.ExampleDiscounts)
 
             }
         }
