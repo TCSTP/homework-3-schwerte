@@ -111,6 +111,7 @@ fun SelectionScreenBonus(
                     onSelected = { selection = option }
                 )
             }
+            items(options) { option -> null}
         }
     }
 }

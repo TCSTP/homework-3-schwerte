@@ -1,4 +1,4 @@
-package tcs.app.dev.homework1
+package tcs.app.dev.homework
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -6,10 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import tcs.app.dev.homework1.data.Cart
-import tcs.app.dev.homework1.data.Discount
-import tcs.app.dev.homework1.data.Shop
-import tcs.app.dev.homework1.data.Screen.*
+import androidx.compose.ui.tooling.preview.Preview
+import tcs.app.dev.homework.data.Cart
+import tcs.app.dev.homework.data.Discount
+import tcs.app.dev.homework.data.Screen.*
+import tcs.app.dev.homework.data.Shop
+import tcs.app.dev.homework.data.MockData.ExampleShop
+import tcs.app.dev.homework.data.MockData.ExampleDiscounts
+import tcs.app.dev.ui.theme.AppTheme
 
 /**
  * # Homework 3 — Shop App
@@ -69,9 +73,9 @@ import tcs.app.dev.homework1.data.Screen.*
  *        button to return to the shop.
  *
  * - **Bottom bar**:
- *       - In Shop/Discounts, show a 2-tab bottom bar to switch between **Shop** and **Discounts**.
- *       - In Cart, hide the tab bar and instead show the cart bottom bar with the total and **Pay**
- *         action as described above.
+*       - In Shop/Discounts, show a 2-tab bottom bar to switch between **Shop** and **Discounts**.
+*       - In Cart, hide the tab bar and instead show the cart bottom bar with the total and **Pay**
+*         action as described above.
  *
  * ## Hints
  * - Keep your cart as a single source of truth and derive counts/price from it.
@@ -94,45 +98,40 @@ import tcs.app.dev.homework1.data.Screen.*
  *
  */
 @Composable
-fun ShopScreenOld(
-    shop: Shop,
-    availableDiscounts: List<Discount>,
-    modifier: Modifier = Modifier
-) {
-    var cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
-
-}
-
-@Composable
 fun ShopScreen(
     shop: Shop,
     availableDiscounts: List<Discount>,
     modifier: Modifier = Modifier
 ) {
-    var cart: Cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
+    var cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
     var screen by rememberSaveable { mutableStateOf(SHOP) }
 
     when (val displayedScreen = screen) {
         SHOP -> ItemSelection(
             cart = cart,
-            onScreen = { currentScreen -> screen = currentScreen },
-            onCart = { currentCart -> cart = currentCart },
+            onCart = { currentScreen -> screen = currentScreen },
+            onDiscount = { currentScreen -> screen = currentScreen },
             modifier = modifier
         )
-
         DISCOUNT -> DiscountSelection(
             cart = cart,
             discounts = availableDiscounts,
-            onScreen = { currentScreen -> screen = currentScreen },
-            onCart = { currentCart -> cart = currentCart },
             modifier = modifier
         )
-
         CART -> CartSelection(
             cart = cart,
-            onScreen = { currentScreen -> screen = currentScreen },
-            onCart = { currentCart -> cart = currentCart },
             modifier = modifier
+        )
+    }
+}
+
+@Composable
+@Preview
+fun ShopScreenPreview() {
+    AppTheme {
+        ShopScreen(
+            shop = ExampleShop,
+            availableDiscounts = ExampleDiscounts
         )
     }
 }

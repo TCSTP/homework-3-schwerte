@@ -41,6 +41,7 @@ import tcs.app.dev.exercise.university.data.LMU
 import tcs.app.dev.exercise.university.data.Option
 import tcs.app.dev.exercise.university.data.TUM
 import tcs.app.dev.exercise.university.data.Universities
+import tcs.app.dev.ui.theme.AppTheme
 
 /**
  * # University selection app
