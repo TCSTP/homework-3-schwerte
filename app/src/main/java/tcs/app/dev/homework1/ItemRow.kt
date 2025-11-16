@@ -3,6 +3,7 @@ package tcs.app.dev.homework1
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,10 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,7 +46,9 @@ fun ItemRow(
     onCart: (Cart) -> Unit
 ) {
 
-    var cart by rememberSaveable { mutableStateOf(cart) }
+    var amount by remember { mutableStateOf(cart.items[item]) }
+    var cart by remember { mutableStateOf(cart) }
+
     val border = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.outline
@@ -64,21 +70,36 @@ fun ItemRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Image(painter = painterResource(getImage(item)), contentDescription = stringResource(getName(item)), modifier = modifier.size(40.dp))
+            Box(modifier, contentAlignment = Alignment.BottomEnd) {
+                Image(
+                    painter = painterResource(getImage(item)),
+                    contentDescription = stringResource(getName(item)),
+                    modifier = modifier.size(40.dp)
+                )
+                if (amount != null) {
+                    Text(
+                        cart.items[item].toString(),
+                        modifier
+                            .padding(2.dp)
+                            .align(Alignment.BottomEnd)
+                            .drawBehind {
+                                drawCircle(
+                                    radius = this.size.maxDimension / 1.8f,
+                                    brush = SolidColor(Color.Black),
+                                )
+                                drawCircle(
+                                    radius = this.size.maxDimension / 2,
+                                    brush = SolidColor(Color.White),
+                                )
+                            },
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
             Text(stringResource(getName(item)), modifier = modifier)
             Text(price.toString(), modifier = modifier)
             Button(
-                onClick = {cart += item; cart.let(onCart) }, content =
-                    {
-                        Icon(
-                            Icons.Outlined.AddShoppingCart,
-                            contentDescription = stringResource(description_add_to_cart),
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp)
-                                .size(32.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        )
-                    },
+                onClick = { cart += item; cart.let(onCart); amount = amount?.plus(1u) ?: 1u },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -86,6 +107,16 @@ fun ItemRow(
                     disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             )
+            {
+                Icon(
+                    Icons.Outlined.AddShoppingCart,
+                    contentDescription = stringResource(description_add_to_cart),
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(32.dp),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
         }
     }
 }
@@ -99,11 +130,12 @@ fun ItemRowApplePreview() {
         ItemRow(
             item = apple,
             cart = Cart(ExampleShop),
-            price = price?:0u.cents,
+            price = price ?: 0u.cents,
             modifier = Modifier
-        ) {{}}
+        ) { {} }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun ItemRowBananaPreview() {
@@ -112,9 +144,9 @@ fun ItemRowBananaPreview() {
     AppTheme {
         ItemRow(
             item = banana,
-            cart = Cart(ExampleShop),
-            price = price?:0u.cents,
+            cart = Cart(ExampleShop, mapOf(banana to 4u)),
+            price = price ?: 0u.cents,
             modifier = Modifier
-        ) {{}}
+        ) { {} }
     }
 }

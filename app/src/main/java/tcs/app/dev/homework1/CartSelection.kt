@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,7 +51,8 @@ fun CartSelection(
     cart: Cart
 ) {
     var screen: Screen? by rememberSaveable { mutableStateOf(CART) }
-    var cart: Cart by rememberSaveable { mutableStateOf(cart) }
+    var cart: Cart by remember { mutableStateOf(cart) }
+    var total: Euro by remember { mutableStateOf(cart.price) }
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
@@ -126,16 +128,14 @@ fun CartSelection(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = stringResource(total_price).format(cart.price),
+                text = stringResource(total_price).format(total),
                 modifier = Modifier.padding(horizontal = 4.dp),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSecondary
             )
             Button(
                 onClick = {
-                    screen = SHOP; cart = Cart(cart.shop); cart.let(onCart); screen?.let(
-                    onScreen
-                )
+                    screen = SHOP; cart = Cart(cart.shop); cart.let(onCart); screen?.let(onScreen)
                 },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
@@ -166,8 +166,9 @@ fun CartSelection(
                 CartItemRow(
                     item = item.key,
                     cart = cart,
+                    onCart = onCart,
                     modifier = Modifier
-                ) {onCart}
+                )
             }
             items(1) { line ->
                 HorizontalDivider(
@@ -180,8 +181,9 @@ fun CartSelection(
                 CartDiscountRow(
                     discount = discount,
                     modifier = Modifier,
+                    onCart = onCart,
                     cart = cart
-                ) { onCart }
+                )
             }
         }
     }

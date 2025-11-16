@@ -45,7 +45,7 @@ fun ItemSelection(
     cart: Cart
 ) {
     var screen: Screen? by rememberSaveable { mutableStateOf(SHOP) }
-    val shop = cart.shop
+
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
             modifier = Modifier
@@ -78,12 +78,12 @@ fun ItemSelection(
                 shape = MaterialTheme.shapes.extraLarge,
                 color = MaterialTheme.colorScheme.onSecondary,
                 modifier = modifier
-                    .size(180.dp, 64.dp)
+                    .size(196.dp, 64.dp)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.surfaceBright)
             ) {
                 Text(
-                    text = stringResource(label_shop),
+                    text = stringResource(name_shop),
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -119,11 +119,11 @@ fun ItemSelection(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(shop.items.toList()) { item ->
+            items(cart.shop.items.toList()) { item ->
                 ItemRow(
                     item = item,
                     cart = cart,
-                    price = shop.prices[item]?:Euro(0u),
+                    price = cart.shop.prices[item]?:Euro(0u),
                     onCart = onCart,
                     modifier = Modifier
                 )
@@ -137,7 +137,7 @@ fun ItemSelection(
 fun ItemSelectionPreview() {
     AppTheme {
         ItemSelection(
-            cart = Cart(shop = ExampleShop),
+            cart = Cart(shop = ExampleShop, items = mapOf(Item("Banana") to 4u)),
             onCart = {}, onScreen = {}
         )
     }

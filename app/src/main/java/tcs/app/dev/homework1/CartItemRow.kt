@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
-import androidx.compose.material.icons.rounded.ArrowForwardIos
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,11 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,8 +41,9 @@ fun CartItemRow(
     modifier: Modifier,
     onCart: (Cart) -> Unit
 ) {
-    var amount by rememberSaveable { mutableStateOf(cart.items[item]?:0u) }
-    var cart by rememberSaveable { mutableStateOf(cart) }
+    var amount by remember { mutableStateOf(cart.items[item]) }
+    var cart by remember { mutableStateOf(cart) }
+
     val border = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.outline
@@ -70,15 +71,21 @@ fun CartItemRow(
             Surface(
                 modifier = modifier,
                 onClick = {
-                    cart.items[item]?.let {
-                        if (it > 1u) {
-                            cart -= item
+                    cart.items[item]?.let { i ->
+                        if (i > 1u) {
+                            val newItems = cart.items.filter { it.key != item } + (item to (i - 1u))
+                            cart = cart.copy(items = newItems)
                         } else {
-                            cart = cart.copy(items = cart.items.filter { it -> it.key != item })
+                            cart -= item
+                            //cart = cart.copy(items = cart.items.filter { it.key != item })
                         }
                     }
                     cart.let(onCart)
-                    amount--
+                    when (amount) {
+                        null -> {}
+                        1u -> amount = null
+                        else -> amount = amount!! - 1u
+                    }
                 }
             ) {
                 Icon(
@@ -89,17 +96,20 @@ fun CartItemRow(
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
-            Text(cart.items[item].toString(), modifier = modifier)
+            Text((cart.items[item]?:0u).toString(), modifier = modifier)
             Surface(
                 modifier = modifier,
                 onClick = {
                     cart += item
                     cart.let(onCart)
-                    amount++
+                    amount = when (amount) {
+                        null -> 1u
+                        else -> amount!! + 1u
+                    }
                 }
             ) {
                 Icon(
-                    Icons.Rounded.ArrowForwardIos,
+                    Icons.AutoMirrored.Rounded.ArrowForwardIos,
                     contentDescription = null,
                     modifier = Modifier
                         .size(24.dp),
@@ -113,7 +123,8 @@ fun CartItemRow(
             )
             Surface(
                 onClick = {
-                    cart = cart.copy(items = cart.items.filter { it -> it.key != item })
+                    cart = cart.copy(items = cart.items.filter { it.key != item })
+                    cart.let(onCart)
                 },
                 color = MaterialTheme.colorScheme.error.copy(0.85f),
                 shape = MaterialTheme.shapes.extraLarge,
