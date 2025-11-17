@@ -41,9 +41,8 @@ import tcs.app.dev.R.string.*
 fun ItemRow(
     item: Item,
     cart: Cart,
-    price: Euro,
-    modifier: Modifier,
-    onCart: (Cart) -> Unit
+    modifier: Modifier = Modifier,
+    onCart: (Cart) -> Unit = {}
 ) {
 
     var amount by remember { mutableStateOf(cart.items[item]) }
@@ -63,7 +62,7 @@ fun ItemRow(
         color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -97,7 +96,7 @@ fun ItemRow(
                 }
             }
             Text(stringResource(getName(item)), modifier = modifier)
-            Text(price.toString(), modifier = modifier)
+            Text(cart.shop.prices[item].toString(), modifier = modifier)
             Button(
                 onClick = {
                     (cart + item).let(onCart)
@@ -114,7 +113,7 @@ fun ItemRow(
                 Icon(
                     Icons.Outlined.AddShoppingCart,
                     contentDescription = stringResource(description_add_to_cart),
-                    modifier = Modifier
+                    modifier = modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
                     tint = purple,
@@ -127,15 +126,11 @@ fun ItemRow(
 @Preview(showBackground = true)
 @Composable
 fun ItemRowApplePreview() {
-    val apple = Item("Apple")
-    val price = ExampleShop.prices[apple]
     AppTheme {
         ItemRow(
-            item = apple,
+            item = Item("Apple"),
             cart = Cart(ExampleShop),
-            price = price ?: 0u.cents,
-            modifier = Modifier
-        ) { {} }
+        )
     }
 }
 
@@ -143,13 +138,10 @@ fun ItemRowApplePreview() {
 @Composable
 fun ItemRowBananaPreview() {
     val banana = Item("Banana")
-    val price = ExampleShop.prices[banana]
     AppTheme {
         ItemRow(
             item = banana,
             cart = Cart(ExampleShop, mapOf(banana to 4u)),
-            price = price ?: 0u.cents,
-            modifier = Modifier
-        ) { {} }
+        )
     }
 }

@@ -40,8 +40,8 @@ import tcs.app.dev.homework1.data.MockData.getName
 fun DiscountRow(
     discount: Discount,
     cart: Cart,
-    modifier: Modifier,
-    onCart: (Cart) -> Unit
+    modifier: Modifier = Modifier,
+    onCart: (Cart) -> Unit = {}
 ) {
     var inCart: Boolean by rememberSaveable { mutableStateOf(cart.discounts.contains(discount)) }
 
@@ -65,7 +65,7 @@ fun DiscountRow(
             is Bundle -> (Icons.Outlined.Backpack to "Bundle")
         }
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -74,7 +74,7 @@ fun DiscountRow(
             Icon(
                 imageVector = icons.first,
                 contentDescription = icons.second,
-                modifier = Modifier
+                modifier = modifier
                     .padding(horizontal = 4.dp)
                     .size(32.dp),
                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -108,7 +108,7 @@ fun DiscountRow(
                 Icon(
                     imageVector = if (inCart) Icons.Outlined.RemoveShoppingCart else Icons.Outlined.AddShoppingCart,
                     contentDescription = "Close",
-                    modifier = Modifier
+                    modifier = modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
                     tint = if (inCart) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSecondaryContainer,
@@ -123,10 +123,9 @@ fun DiscountRow(
 fun DiscountRowAmountPreview() {
     AppTheme {
         DiscountRow(
-            modifier = Modifier,
             discount = ExampleDiscounts[0],
             cart = Cart(ExampleShop)
-        ) { {} }
+        )
     }
 }
 
@@ -135,10 +134,9 @@ fun DiscountRowAmountPreview() {
 fun DiscountRowPercentPreview() {
     AppTheme {
         DiscountRow(
-            modifier = Modifier,
             discount = ExampleDiscounts[1],
             cart = Cart(ExampleShop)
-        ) { {} }
+        )
     }
 }
 
@@ -148,9 +146,8 @@ fun DiscountRowBundleInCartPreview() {
     AppTheme {
         val discount = ExampleDiscounts[2]
         DiscountRow(
-            modifier = Modifier,
             discount = discount,
             cart = Cart(ExampleShop, allDiscounts = listOf(discount))
-        ) { {} }
+        )
     }
 }

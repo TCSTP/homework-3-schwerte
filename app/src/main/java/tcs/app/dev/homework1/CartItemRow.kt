@@ -16,10 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,9 +34,8 @@ import tcs.app.dev.R.string.*
 fun CartItemRow(
     item: Item,
     cart: Cart,
-    modifier: Modifier,
-    onScreen: (Screen) -> Unit,
-    onCart: (Cart) -> Unit
+    modifier: Modifier = Modifier,
+    onCart: (Cart) -> Unit = {}
 ) {
 
     val border = BorderStroke(
@@ -56,7 +51,7 @@ fun CartItemRow(
         color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -73,14 +68,16 @@ fun CartItemRow(
                     when (cart.items[item]) {
                         null -> cart.let(onCart)
                         1u -> (cart - item).let(onCart)
-                        else -> (cart.copy(items=cart.items.filter { it.key != item } + (item to cart.items[item]!! - 1u))).let(onCart)
+                        else -> (cart.copy(items = cart.items.filter { it.key != item } + (item to cart.items[item]!! - 1u))).let(
+                            onCart
+                        )
                     }
                 }
             ) {
                 Icon(
                     Icons.Rounded.ArrowBackIosNew,
                     contentDescription = null,
-                    modifier = Modifier
+                    modifier = modifier
                         .size(24.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -93,7 +90,7 @@ fun CartItemRow(
                 Icon(
                     Icons.AutoMirrored.Rounded.ArrowForwardIos,
                     contentDescription = null,
-                    modifier = Modifier
+                    modifier = modifier
                         .size(24.dp),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
@@ -113,7 +110,7 @@ fun CartItemRow(
                 Icon(
                     Icons.Rounded.Close,
                     contentDescription = stringResource(description_close),
-                    modifier = Modifier
+                    modifier = modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
                     tint = MaterialTheme.colorScheme.errorContainer,
@@ -130,10 +127,8 @@ fun CartRowApplePreview() {
     AppTheme {
         CartItemRow(
             item = apple,
-            cart = Cart(ExampleShop, items = mapOf(apple to 3u)),
-            modifier = Modifier,
-            onScreen = {}
-        ) { {} }
+            cart = Cart(ExampleShop, items = mapOf(apple to 3u))
+        )
     }
 }
 
@@ -144,9 +139,7 @@ fun CartRowBananaPreview() {
     AppTheme {
         CartItemRow(
             item = banana,
-            cart = Cart(ExampleShop, items = mapOf(banana to 5u)),
-            modifier = Modifier,
-            onScreen = {}
-        ) { {} }
+            cart = Cart(ExampleShop, items = mapOf(banana to 5u))
+        )
     }
 }
