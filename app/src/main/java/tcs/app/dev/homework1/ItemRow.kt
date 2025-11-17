@@ -47,21 +47,20 @@ fun ItemRow(
 ) {
 
     var amount by remember { mutableStateOf(cart.items[item]) }
-    var cart by remember { mutableStateOf(cart) }
 
     val border = BorderStroke(
         width = 1.dp,
         color = MaterialTheme.colorScheme.outline
     )
+    val purple = MaterialTheme.colorScheme.onPrimaryContainer
 
-    val color = MaterialTheme.colorScheme.surface
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = MaterialTheme.shapes.medium,
         border = border,
-        color = color,
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Row(
             modifier = Modifier
@@ -85,24 +84,28 @@ fun ItemRow(
                             .drawBehind {
                                 drawCircle(
                                     radius = this.size.maxDimension / 1.8f,
-                                    brush = SolidColor(Color.Black),
+                                    brush = SolidColor(purple),
                                 )
                                 drawCircle(
                                     radius = this.size.maxDimension / 2,
                                     brush = SolidColor(Color.White),
                                 )
                             },
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
+                        color = purple
                     )
                 }
             }
             Text(stringResource(getName(item)), modifier = modifier)
             Text(price.toString(), modifier = modifier)
             Button(
-                onClick = { cart += item; cart.let(onCart); amount = amount?.plus(1u) ?: 1u },
+                onClick = {
+                    (cart + item).let(onCart)
+                    amount = amount?.plus(1u) ?: 1u
+                },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    contentColor = purple,
                     disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                     disabledContentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -114,7 +117,7 @@ fun ItemRow(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = purple,
                 )
             }
         }

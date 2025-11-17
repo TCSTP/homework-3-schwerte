@@ -43,7 +43,6 @@ fun DiscountRow(
     modifier: Modifier,
     onCart: (Cart) -> Unit
 ) {
-    var cart: Cart by rememberSaveable { mutableStateOf(cart) }
     var inCart: Boolean by rememberSaveable { mutableStateOf(cart.discounts.contains(discount)) }
 
     val border = BorderStroke(
@@ -92,12 +91,11 @@ fun DiscountRow(
             Text(text, modifier = modifier)
             Button(
                 onClick = {
-                    if (inCart) {
-                        cart -= discount
+                    (if (inCart) {
+                        cart - discount
                     } else {
-                        cart += discount
-                    }
-                    cart.let( onCart )
+                        cart + discount
+                    }).let(onCart)
                     inCart = !inCart
                 },
                 colors = ButtonColors(

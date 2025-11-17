@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import tcs.app.dev.homework1.data.Cart
 import tcs.app.dev.homework1.data.Discount
+import tcs.app.dev.homework1.data.Screen
 import tcs.app.dev.homework1.data.Shop
 import tcs.app.dev.homework1.data.Screen.*
 
@@ -93,15 +94,6 @@ import tcs.app.dev.homework1.data.Screen.*
  * - [Pager](https://developer.android.com/develop/ui/compose/layouts/pager)
  *
  */
-@Composable
-fun ShopScreenOld(
-    shop: Shop,
-    availableDiscounts: List<Discount>,
-    modifier: Modifier = Modifier
-) {
-    var cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
-
-}
 
 @Composable
 fun ShopScreen(
@@ -110,7 +102,7 @@ fun ShopScreen(
     modifier: Modifier = Modifier
 ) {
     var cart: Cart by rememberSaveable { mutableStateOf(Cart(shop = shop)) }
-    var screen by rememberSaveable { mutableStateOf(SHOP) }
+    var screen: Screen by rememberSaveable { mutableStateOf(SHOP) }
 
     when (val displayedScreen = screen) {
         SHOP -> ItemSelection(

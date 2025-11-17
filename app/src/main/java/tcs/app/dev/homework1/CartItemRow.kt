@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,16 +32,16 @@ import tcs.app.dev.homework1.data.*
 import tcs.app.dev.homework1.data.MockData.ExampleShop
 import tcs.app.dev.homework1.data.MockData.getName
 import tcs.app.dev.homework1.data.MockData.getImage
+import tcs.app.dev.R.string.*
 
 @Composable
 fun CartItemRow(
     item: Item,
     cart: Cart,
     modifier: Modifier,
+    onScreen: (Screen) -> Unit,
     onCart: (Cart) -> Unit
 ) {
-    var amount by remember { mutableStateOf(cart.items[item]) }
-    var cart by remember { mutableStateOf(cart) }
 
     val border = BorderStroke(
         width = 1.dp,
@@ -71,20 +70,10 @@ fun CartItemRow(
             Surface(
                 modifier = modifier,
                 onClick = {
-                    cart.items[item]?.let { i ->
-                        if (i > 1u) {
-                            val newItems = cart.items.filter { it.key != item } + (item to (i - 1u))
-                            cart = cart.copy(items = newItems)
-                        } else {
-                            cart -= item
-                            //cart = cart.copy(items = cart.items.filter { it.key != item })
-                        }
-                    }
-                    cart.let(onCart)
-                    when (amount) {
-                        null -> {}
-                        1u -> amount = null
-                        else -> amount = amount!! - 1u
+                    when (cart.items[item]) {
+                        null -> cart.let(onCart)
+                        1u -> (cart - item).let(onCart)
+                        else -> (cart.copy(items=cart.items.filter { it.key != item } + (item to cart.items[item]!! - 1u))).let(onCart)
                     }
                 }
             ) {
@@ -96,17 +85,10 @@ fun CartItemRow(
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
-            Text((cart.items[item]?:0u).toString(), modifier = modifier)
+            Text(cart.items[item].toString(), modifier = modifier)
             Surface(
                 modifier = modifier,
-                onClick = {
-                    cart += item
-                    cart.let(onCart)
-                    amount = when (amount) {
-                        null -> 1u
-                        else -> amount!! + 1u
-                    }
-                }
+                onClick = { (cart + item).let(onCart) }
             ) {
                 Icon(
                     Icons.AutoMirrored.Rounded.ArrowForwardIos,
@@ -122,10 +104,7 @@ fun CartItemRow(
                 modifier = modifier
             )
             Surface(
-                onClick = {
-                    cart = cart.copy(items = cart.items.filter { it.key != item })
-                    cart.let(onCart)
-                },
+                onClick = { (cart - item).let(onCart) },
                 color = MaterialTheme.colorScheme.error.copy(0.85f),
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = modifier.size(26.dp),
@@ -133,7 +112,7 @@ fun CartItemRow(
             {
                 Icon(
                     Icons.Rounded.Close,
-                    contentDescription = null,
+                    contentDescription = stringResource(description_close),
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
                         .size(32.dp),
@@ -152,7 +131,8 @@ fun CartRowApplePreview() {
         CartItemRow(
             item = apple,
             cart = Cart(ExampleShop, items = mapOf(apple to 3u)),
-            modifier = Modifier
+            modifier = Modifier,
+            onScreen = {}
         ) { {} }
     }
 }
@@ -165,7 +145,8 @@ fun CartRowBananaPreview() {
         CartItemRow(
             item = banana,
             cart = Cart(ExampleShop, items = mapOf(banana to 5u)),
-            modifier = Modifier
+            modifier = Modifier,
+            onScreen = {}
         ) { {} }
     }
 }

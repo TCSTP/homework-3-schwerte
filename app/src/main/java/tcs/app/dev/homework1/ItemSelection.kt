@@ -39,12 +39,11 @@ import tcs.app.dev.homework1.data.MockData.ExampleShop
 
 @Composable
 fun ItemSelection(
+    cart: Cart,
     modifier: Modifier = Modifier,
     onScreen: (Screen) -> Unit,
-    onCart: (Cart) -> Unit,
-    cart: Cart
+    onCart: (Cart) -> Unit
 ) {
-    var screen: Screen? by rememberSaveable { mutableStateOf(SHOP) }
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
@@ -57,7 +56,7 @@ fun ItemSelection(
         )
         {
             Button(
-                onClick = { screen = DISCOUNT; screen?.let(onScreen) },
+                onClick = { DISCOUNT.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -91,7 +90,7 @@ fun ItemSelection(
                 )
             }
             Button(
-                onClick = { screen = CART; screen?.let(onScreen) },
+                onClick = { CART.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,

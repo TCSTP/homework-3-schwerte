@@ -29,7 +29,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,8 +38,6 @@ import tcs.app.dev.ui.theme.AppTheme
 import tcs.app.dev.R.string.*
 import tcs.app.dev.homework1.data.Screen.*
 import tcs.app.dev.homework1.data.MockData.ExampleShop
-import tcs.app.dev.homework1.data.MockData.getName
-import tcs.app.dev.homework1.data.MockData.getImage
 import tcs.app.dev.homework1.data.Discount.*
 
 @Composable
@@ -50,9 +47,6 @@ fun CartSelection(
     onCart: (Cart) -> Unit,
     cart: Cart
 ) {
-    var screen: Screen? by rememberSaveable { mutableStateOf(CART) }
-    var cart: Cart by remember { mutableStateOf(cart) }
-    var total: Euro by remember { mutableStateOf(cart.price) }
 
     Scaffold(modifier = modifier.fillMaxSize(), topBar = {
         Row(
@@ -65,7 +59,7 @@ fun CartSelection(
         )
         {
             Button(
-                onClick = { screen = DISCOUNT; screen?.let(onScreen) },
+                onClick = { DISCOUNT.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -83,7 +77,7 @@ fun CartSelection(
                 )
             }
             Button(
-                onClick = { screen = SHOP; screen?.let(onScreen) },
+                onClick = { SHOP.let(onScreen) },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
                     contentColor = MaterialTheme.colorScheme.secondary,
@@ -128,14 +122,14 @@ fun CartSelection(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Text(
-                text = stringResource(total_price).format(total),
+                text = stringResource(total_price).format(cart.price),
                 modifier = Modifier.padding(horizontal = 4.dp),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSecondary
             )
             Button(
                 onClick = {
-                    screen = SHOP; cart = Cart(cart.shop); cart.let(onCart); screen?.let(onScreen)
+                    (Cart(cart.shop)).let(onCart); SHOP.let(onScreen)
                 },
                 colors = ButtonColors(
                     containerColor = MaterialTheme.colorScheme.onSecondary,
@@ -162,15 +156,16 @@ fun CartSelection(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            items(cart.items.entries.toList()) { item ->
+            items(cart.items.keys.toList()) { item ->
                 CartItemRow(
-                    item = item.key,
+                    item = item,
                     cart = cart,
                     onCart = onCart,
+                    onScreen = onScreen,
                     modifier = Modifier
                 )
             }
-            items(1) { line ->
+            items(1) { _ ->
                 HorizontalDivider(
                     modifier = modifier.padding(vertical = 8.dp),
                     color = MaterialTheme.colorScheme.secondary,

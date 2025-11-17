@@ -88,10 +88,7 @@ fun CartDiscountRow(
             }
             Text(text, modifier = modifier)
             Surface(
-                onClick = {
-                    cart -= discount
-                    cart.let(onCart)
-                },
+                onClick = { (cart - discount).let(onCart) },
                 color = MaterialTheme.colorScheme.error.copy(0.85f),
                 shape = MaterialTheme.shapes.extraLarge,
                 modifier = modifier.size(26.dp),
